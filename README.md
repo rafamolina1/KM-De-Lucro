@@ -2,7 +2,7 @@
 
 O **KM de Lucro** é uma plataforma web de gestão financeira simplificada, desenvolvida especificamente para motoristas de carga autônomos. O projeto nasceu com o objetivo de substituir planilhas complexas e anotações manuais por uma interface intuitiva e focada em performance, permitindo que o motorista entenda a saúde financeira de sua operação em tempo real.
 
-![Home do Projeto](/public/screenshots/home.png)
+![Home do Projeto](/public/screenshots/homepage.png)
 
 ## ✨ Proposta de Valor
 A aplicação resolve o problema da "conta de cabeça", automatizando o cálculo de rentabilidade. Ao inserir os dados básicos de um frete e seus respectivos custos, o sistema entrega instantaneamente o lucro líquido e a margem de lucro percentual.
