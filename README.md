@@ -1,5 +1,7 @@
 # 🚚 KM de Lucro - Gestão Financeira para Motoristas
 
+[Português](README.md) | [English](README.en.md)
+
 O **KM de Lucro** é uma plataforma web de gestão financeira simplificada, desenvolvida especificamente para motoristas de carga autônomos. O projeto nasceu com o objetivo de substituir planilhas complexas e anotações manuais por uma interface intuitiva e focada em performance, permitindo que o motorista entenda a saúde financeira de sua operação em tempo real.
 
 ![Home do Projeto](/public/screenshots/homepage.png)
