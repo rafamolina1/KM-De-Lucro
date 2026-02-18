@@ -20,6 +20,7 @@ Este arquivo é só para você acompanhar o que falta até o MVP ficar redondinh
   - [x] Criar página `/planos` explicando:
     - Plano **Gratuito**: até 10 fretes.
     - Plano **Pro**: R$ 19,90/mês, fretes ilimitados.
+    - [x] Exportar relatório em CSV/PDF (exclusivo PRO).
   - [x] Mostrar **benefícios práticos** do Pro (menos planilha, visão clara de lucro, etc.).
 
 - **PIX manual**
@@ -83,3 +84,9 @@ Este arquivo é só para você acompanhar o que falta até o MVP ficar redondinh
   - [ ] Testar limite de 10 fretes no plano gratuito.
   - [ ] Testar ativação manual do plano Pro via admin.
 
+
+### 6. Backlog / Pós-MVP (Melhorias futuras)
+
+- **Automatização de rotas**
+  - [ ] Implementar autocomplete de cidades (Google Places ou IBGE).
+  - [ ] Calcular distância automática (Google Directions ou OSRM) para preencher o campo KM sozinho.

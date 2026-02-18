@@ -91,7 +91,8 @@ export default function PlanosPage() {
                 Chave PIX
               </p>
               <p className="text-xs font-mono font-semibold text-zinc-900 break-all">
-                SEU_EMAIL_OU_CHAVE_AQUI@exemplo.com
+                RAFAELOLIVEIRAMOLINA@GMAIL.COM
+                Whatsapp: (73) 99845-3262
               </p>
             </div>
             <div className="space-y-1.5 text-[11px]">

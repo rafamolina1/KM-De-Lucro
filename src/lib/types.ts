@@ -1,7 +1,7 @@
 export type Freight = {
   id: string;
   user_id: string;
-  date: string; // ISO
+  date: string;
   origin: string;
   destination: string;
   km: number;
@@ -14,7 +14,7 @@ export type Freight = {
 };
 
 export type MonthlySummary = {
-  month: string; // YYYY-MM
+  month: string;
   totalFreights: number;
   totalRevenue: number;
   totalCosts: number;

@@ -8,8 +8,6 @@ export default function AuthCallbackPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Quando a página carrega, o Supabase lê o token da URL,
-    // cria a sessão e depois redirecionamos para o app.
     supabase.auth
       .getSession()
       .finally(() => {

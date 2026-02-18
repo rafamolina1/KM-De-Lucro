@@ -1,13 +1,15 @@
-`use client`;
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { supabase } from "@/lib/supabaseClient";
 import { Freight } from "@/lib/types";
 
 type MonthOption = {
-  id: string; // YYYY-MM
-  label: string; // MM/YYYY
+  id: string;
+  label: string;
 };
 
 function getLastMonths(count: number): MonthOption[] {
@@ -25,6 +27,92 @@ function getLastMonths(count: number): MonthOption[] {
   }
 
   return result;
+}
+
+function exportToCSV(freights: Freight[]) {
+  const headers = [
+    "Data",
+    "Origem",
+    "Destino",
+    "KM",
+    "Valor",
+    "Custos",
+    "Lucro",
+    "Margem",
+  ];
+  const rows = freights.map((f) => [
+    new Date(f.date).toLocaleDateString("pt-BR"),
+    f.origin,
+    f.destination,
+    f.km.toString().replace(".", ","),
+    f.value.toFixed(2).replace(".", ","),
+    (f.diesel + f.tolls + f.other_costs).toFixed(2).replace(".", ","),
+    f.profit.toFixed(2).replace(".", ","),
+    (f.margin * 100).toFixed(1).replace(".", ",") + "%",
+  ]);
+
+  const csvContent =
+    "\uFEFF" + [headers, ...rows].map((e) => e.join(";")).join("\n");
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `relatorio_fretes_${new Date()
+    .toISOString()
+    .slice(0, 10)}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function exportToPDF(freights: Freight[], monthLabel: string) {
+  const doc = new jsPDF();
+
+  doc.setFontSize(16);
+  doc.text(`Relatório de Fretes - ${monthLabel}`, 14, 20);
+
+  const totalProfit = freights.reduce((acc, f) => acc + f.profit, 0);
+
+  doc.setFontSize(10);
+  doc.text(
+    `Gerado em: ${new Date().toLocaleDateString("pt-BR")} | Total de Fretes: ${freights.length
+    } | Lucro Total: R$ ${totalProfit.toFixed(2)}`,
+    14,
+    28,
+  );
+
+  const tableColumn = [
+    "Data",
+    "Origem",
+    "Destino",
+    "KM",
+    "Valor",
+    "Custos",
+    "Lucro",
+    "Mg%",
+  ];
+
+  const tableRows = freights.map((f) => [
+    new Date(f.date).toLocaleDateString("pt-BR"),
+    f.origin,
+    f.destination,
+    f.km.toString(),
+    f.value.toFixed(2),
+    (f.diesel + f.tolls + f.other_costs).toFixed(2),
+    f.profit.toFixed(2),
+    (f.margin * 100).toFixed(1) + "%",
+  ]);
+
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: 35,
+    styles: { fontSize: 8 },
+    headStyles: { fillColor: [0, 128, 0] },
+  });
+
+  doc.save(`relatorio_fretes_${new Date().toISOString().slice(0, 10)}.pdf`);
 }
 
 export default function FreightsDashboard() {
@@ -53,6 +141,54 @@ export default function FreightsDashboard() {
     monthOptions[0]?.id ?? "",
   );
 
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir este frete?")) return;
+
+    const { error } = await supabase.from("freights").delete().eq("id", id);
+
+    if (error) {
+      console.error(error);
+      alert("Erro ao excluir frete.");
+    } else {
+      setFreights((prev) => prev.filter((f) => f.id !== id));
+    }
+  };
+
+  const handleEdit = (freight: Freight) => {
+    setEditingId(freight.id);
+
+    let d = freight.date;
+    if (d && d.includes('T')) {
+      d = d.split('T')[0];
+    }
+    setDate(d);
+
+    setOrigin(freight.origin);
+    setDestination(freight.destination);
+    setKm(freight.km.toString());
+    setValue(freight.value.toString());
+    setDiesel(freight.diesel > 0 ? freight.diesel.toString() : "");
+    setTolls(freight.tolls > 0 ? freight.tolls.toString() : "");
+    setOtherCosts(freight.other_costs > 0 ? freight.other_costs.toString() : "");
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setDate(new Date().toISOString().slice(0, 10));
+    setOrigin("");
+    setDestination("");
+    setKm("");
+    setValue("");
+    setDiesel("");
+    setTolls("");
+    setOtherCosts("");
+    setFormError(null);
+  };
+
   useEffect(() => {
     const load = async () => {
       const {
@@ -64,7 +200,6 @@ export default function FreightsDashboard() {
         return;
       }
 
-      // garante que o perfil exista e obtém o plano
       const { data: profileData } = await supabase
         .from("profiles")
         .upsert({ id: user.id }, { onConflict: "id" })
@@ -104,7 +239,6 @@ export default function FreightsDashboard() {
         setFreights((data ?? []) as Freight[]);
       }
 
-      // busca lucro do mês anterior para comparação
       const { data: prevData, error: prevError } = await supabase
         .from("freights")
         .select("profit")
@@ -188,7 +322,7 @@ export default function FreightsDashboard() {
         <h2 className="mb-3 text-sm font-semibold text-[color:var(--km-blue)]">
           Novo frete
         </h2>
-        {plan === "free" && freights.length >= 10 && (
+        {plan === "free" && freights.length >= 10 && !editingId && (
           <div className="mb-3 space-y-2 rounded-lg border-2 border-[color:var(--km-green)] bg-gradient-to-r from-emerald-50 to-white px-4 py-3 text-xs shadow-sm">
             <p className="font-bold text-zinc-900">
               🎉 Você já testou 10 fretes! E aí, está te ajudando?
@@ -210,7 +344,7 @@ export default function FreightsDashboard() {
             event.preventDefault();
             setFormError(null);
 
-            if (plan === "free" && freights.length >= 10) {
+            if (!editingId && plan === "free" && freights.length >= 10) {
               setFormError(
                 "Limite de 10 fretes no plano gratuito atingido. Acesse a página de planos para ativar o Pro e continuar lançando fretes ilimitados.",
               );
@@ -241,6 +375,39 @@ export default function FreightsDashboard() {
             const margin = valueNumber > 0 ? profit / valueNumber : 0;
 
             setSaving(true);
+            if (editingId) {
+              const { error, data } = await supabase
+                .from("freights")
+                .update({
+                  date,
+                  origin,
+                  destination,
+                  km: kmNumber,
+                  value: valueNumber,
+                  diesel: dieselNumber,
+                  tolls: tollsNumber,
+                  other_costs: otherNumber,
+                  profit,
+                  margin,
+                })
+                .eq("id", editingId)
+                .select()
+                .single();
+
+              setSaving(false);
+
+              if (error) {
+                console.error(error);
+                setFormError("Erro ao atualizar o frete.");
+              } else if (data) {
+                setFreights((prev) =>
+                  prev.map((f) => (f.id === editingId ? (data as Freight) : f)),
+                );
+                handleCancelEdit();
+              }
+              return;
+            }
+
             const { error, data } = await supabase
               .from("freights")
               .insert({
@@ -271,17 +438,14 @@ export default function FreightsDashboard() {
               setFreights((prev) => [data as Freight, ...prev]);
             }
 
-            setOrigin("");
-            setDestination("");
-            setKm("");
-            setValue("");
-            setDiesel("");
-            setTolls("");
+            handleCancelEdit();
+
             setOtherCosts("");
+            setFormError(null);
           }}
         >
           <div className="space-y-1">
-            <label className="text-xs font-medium text-zinc-700">Data</label>
+            <label className="text-xs font-medium text-zinc-700">Data {editingId && <span className="text-[color:var(--km-green)]">(Editando)</span>}</label>
             <input
               type="date"
               value={date}
@@ -365,13 +529,28 @@ export default function FreightsDashboard() {
               inputMode="decimal"
             />
           </div>
-          <div className="flex items-end">
+          <div className="flex items-end gap-2">
+            {editingId && (
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                className="w-1/3 rounded-md border border-zinc-300 px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
+              >
+                Cancelar
+              </button>
+            )}
             <button
               type="submit"
-              disabled={saving || (plan === "free" && freights.length >= 10)}
-              className="w-full rounded-md bg-[color:var(--km-green)] px-3 py-2 text-xs font-medium text-white hover:bg-emerald-600 disabled:opacity-60"
+              disabled={
+                saving || (!editingId && plan === "free" && freights.length >= 10)
+              }
+              className="flex-1 rounded-md bg-[color:var(--km-green)] px-3 py-2 text-xs font-medium text-white hover:bg-emerald-600 disabled:opacity-60"
             >
-              {saving ? "Salvando..." : "Salvar frete"}
+              {saving
+                ? "Salvando..."
+                : editingId
+                  ? "Atualizar frete"
+                  : "Salvar frete"}
             </button>
           </div>
         </form>
@@ -407,9 +586,8 @@ export default function FreightsDashboard() {
           </p>
           {profitDiff !== null && (
             <p
-              className={`mt-1 text-[10px] font-medium ${
-                profitDiff >= 0 ? "text-emerald-700" : "text-red-600"
-              }`}
+              className={`mt-1 text-[10px] font-medium ${profitDiff >= 0 ? "text-emerald-700" : "text-red-600"
+                }`}
             >
               {profitDiff >= 0 ? "↑" : "↓"} {Math.abs(profitDiff).toFixed(2)} em
               relação ao mês anterior
@@ -427,6 +605,39 @@ export default function FreightsDashboard() {
           <h2 className="text-sm font-semibold text-zinc-800">
             Últimos fretes
           </h2>
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                if (plan !== "pro") {
+                  alert(
+                    "Relatórios são exclusivos do Plano Pro. Assine para liberar!",
+                  );
+                  return;
+                }
+                exportToCSV(freights);
+              }}
+              className="text-xs font-medium text-[color:var(--km-green)] hover:underline"
+            >
+              Baixar CSV
+            </button>
+            <button
+              onClick={() => {
+                if (plan !== "pro") {
+                  alert(
+                    "Relatórios são exclusivos do Plano Pro. Assine para liberar!",
+                  );
+                  return;
+                }
+                const currentLabel =
+                  monthOptions.find((m) => m.id === selectedMonth)?.label ??
+                  "Mês atual";
+                exportToPDF(freights, currentLabel);
+              }}
+              className="text-xs font-medium text-zinc-600 hover:underline"
+            >
+              Baixar PDF
+            </button>
+          </div>
         </div>
         {freights.length === 0 ? (
           <div className="space-y-3 rounded-lg bg-gradient-to-br from-zinc-50 to-white p-5 border border-zinc-200">
@@ -464,6 +675,7 @@ export default function FreightsDashboard() {
                   <th className="px-2 py-2 text-right">Custos</th>
                   <th className="px-2 py-2 text-right">Lucro</th>
                   <th className="px-2 py-2 text-right">Margem</th>
+                  <th className="px-2 py-2 text-right">Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -489,6 +701,24 @@ export default function FreightsDashboard() {
                       <td className="px-2 py-1 text-right">
                         {(f.margin * 100).toFixed(1)}%
                       </td>
+                      <td className="px-2 py-1 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleEdit(f)}
+                            className="text-zinc-500 hover:text-blue-600"
+                            title="Editar"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => handleDelete(f.id)}
+                            className="text-zinc-500 hover:text-red-600"
+                            title="Excluir"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   );
                 })}
@@ -500,4 +730,3 @@ export default function FreightsDashboard() {
     </div>
   );
 }
-

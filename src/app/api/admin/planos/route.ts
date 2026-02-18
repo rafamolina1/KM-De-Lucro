@@ -42,8 +42,6 @@ export async function POST(request: Request) {
     auth: { persistSession: false },
   });
 
-  // Supabase não tem lookup direto por e-mail na API admin via JS client.
-  // Para o MVP (poucos usuários), listamos e filtramos.
   let foundUserId: string | null = null;
   let page = 1;
 
