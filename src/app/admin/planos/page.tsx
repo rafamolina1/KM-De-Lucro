@@ -67,7 +67,7 @@ export default function AdminPlanosPage() {
             value={inputSecret}
             onChange={(e) => setInputSecret(e.target.value)}
             className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm"
-            placeholder="Segredo definido no .env.local"
+            placeholder="Digite o segredo"
           />
         </div>
 
