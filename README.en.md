@@ -4,7 +4,7 @@
 
 Web application for independent truck drivers to track revenue, costs, profit, and freight margin without relying on spreadsheets.
 
-![KM de Lucro dashboard](./public/screenshots/dashboard.png)
+![KM de Lucro dashboard](./public/screenshots/dashkm.png)
 
 ## Overview
 

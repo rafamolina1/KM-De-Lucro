@@ -4,7 +4,7 @@
 
 Aplicação web para motoristas autônomos controlarem faturamento, custos, lucro e margem por frete sem depender de planilhas.
 
-![Dashboard do KM de Lucro](./public/screenshots/dashboard.png)
+![Dashboard do KM de Lucro](./public/screenshots/dashkm.png)
 
 ## Visão geral
 
