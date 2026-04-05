@@ -1,13 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  /* Cores da marca KM de Lucro */
-  --km-blue: #1c4e80;
-  --km-green: #31a24c;
-  --km-yellow: #f9b233;
+  --km-blue: #123f67;
+  --km-blue-strong: #0d2f4d;
+  --km-green: #2f9b4d;
+  --km-green-strong: #1f7a39;
+  --km-yellow: #f2b705;
+  --km-sand: #f7f2e6;
+  --km-cloud: #eef4ef;
 
-  --background: #f4f5f7;
-  --foreground: #0f172a;
+  --background: #f6f0e4;
+  --background-strong: #efe6d5;
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-strong: #ffffff;
+  --surface-soft: rgba(255, 255, 255, 0.58);
+  --foreground: #102530;
+  --foreground-muted: #556974;
+  --border: rgba(16, 37, 48, 0.12);
+  --shadow-soft: 0 24px 70px -38px rgba(16, 37, 48, 0.28);
 }
 
 @theme inline {
@@ -20,10 +30,156 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background-image:
+    radial-gradient(circle at top left, rgba(47, 155, 77, 0.14), transparent 28%),
+    radial-gradient(circle at top right, rgba(18, 63, 103, 0.14), transparent 24%),
+    linear-gradient(180deg, #fbf8f0 0%, #f7f1e4 44%, #f1eadc 100%);
+  min-height: 100vh;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(16, 37, 48, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 37, 48, 0.03) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.8), transparent 84%);
+  opacity: 0.35;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease,
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--km-green) 64%, white);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--km-yellow) 46%, white);
+  color: var(--km-blue-strong);
+}
+
+.km-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(18px);
+}
+
+.km-panel-strong {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.88));
+  border: 1px solid rgba(16, 37, 48, 0.12);
+  box-shadow: 0 30px 80px -42px rgba(16, 37, 48, 0.36);
+}
+
+.km-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(18, 63, 103, 0.12);
+  background: rgba(255, 255, 255, 0.74);
+  padding: 0.5rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--foreground);
+  backdrop-filter: blur(12px);
+}
+
+.km-input {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid rgba(16, 37, 48, 0.12);
+  background: rgba(255, 255, 255, 0.88);
+  padding: 0.8rem 0.95rem;
+  font-size: 0.9rem;
+  color: var(--foreground);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.km-input::placeholder {
+  color: color-mix(in srgb, var(--foreground-muted) 72%, white);
+}
+
+.km-input:hover {
+  border-color: rgba(18, 63, 103, 0.24);
+}
+
+.km-input:focus {
+  border-color: rgba(47, 155, 77, 0.52);
+  box-shadow:
+    0 0 0 4px rgba(47, 155, 77, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.km-button-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--km-green) 0%, var(--km-green-strong) 100%);
+  padding: 0.9rem 1.35rem;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 20px 36px -24px rgba(31, 122, 57, 0.8);
+}
+
+.km-button-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 22px 40px -24px rgba(31, 122, 57, 0.92);
+}
+
+.km-button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(16, 37, 48, 0.12);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0.9rem 1.35rem;
+  font-weight: 700;
+  color: var(--foreground);
+  backdrop-filter: blur(12px);
+}
+
+.km-button-secondary:hover {
+  border-color: rgba(18, 63, 103, 0.24);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+img {
+  height: auto;
+  max-width: 100%;
+}

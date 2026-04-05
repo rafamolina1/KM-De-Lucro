@@ -1,60 +1,119 @@
-# 🚚 KM de Lucro - Gestão Financeira para Motoristas
+# KM de Lucro
 
 [Português](README.md) | [English](README.en.md)
 
-O **KM de Lucro** é uma plataforma web de gestão financeira simplificada, desenvolvida especificamente para motoristas de carga autônomos. O projeto nasceu com o objetivo de substituir planilhas complexas e anotações manuais por uma interface intuitiva e focada em performance, permitindo que o motorista entenda a saúde financeira de sua operação em tempo real.
+Aplicação web para motoristas autônomos controlarem faturamento, custos, lucro e margem por frete sem depender de planilhas.
 
-![Home do Projeto](/public/screenshots/homepage.png)
+![Dashboard do KM de Lucro](./public/screenshots/dashboard.png)
 
-## ✨ Proposta de Valor
-A aplicação resolve o problema da "conta de cabeça", automatizando o cálculo de rentabilidade. Ao inserir os dados básicos de um frete e seus respectivos custos, o sistema entrega instantaneamente o lucro líquido e a margem de lucro percentual.
+## Visão geral
 
-![Dashboard do Projeto](/public/screenshots/dashboard.png)
+O KM de Lucro foi pensado para transformar dados básicos da viagem em leitura financeira prática. Em vez de fazer conta de cabeça ou manter planilhas paralelas, o motorista registra cada frete e acompanha o resultado mensal em uma interface direta.
 
-## 🛠️ Funcionalidades Principais
-*   **Calculadora de Rentabilidade**: Processamento imediato de margem e lucro por viagem.
-*   **Gestão de Fluxo Mensal**: Histórico organizado por mês e ano, permitindo comparar o desempenho financeiro entre períodos.
-*   **Business Intelligence para Motoristas**: Identificação de quais rotas e tipos de frete são mais lucrativos através de resumos financeiros detalhados.
-*   **Exportação de Dados**: Geração de relatórios profissionais em PDF e CSV para controle externo ou contabilidade.
-*   **Acesso Sem Senha**: Autenticação via Magic Link (Supabase Auth), priorizando a segurança e facilidade de acesso.
+### O que o produto entrega
 
-## 🚀 Tecnologias Utilizadas
-*   **Framework**: [Next.js 15+](https://nextjs.org/) (App Router)
-*   **Linguagem**: [TypeScript](https://www.typescriptlang.org/)
-*   **Estilização**: [Tailwind CSS](https://tailwindcss.com/)
-*   **Banco de Dados & Autenticação**: [Supabase](https://supabase.com/)
-*   **Relatórios**: [jsPDF](https://github.com/parallax/jsPDF)
+- Cadastro de fretes com data, origem, destino, KM, valor e custos.
+- Cálculo automático de lucro líquido, margem e lucro por KM.
+- Resumo mensal com faturamento, custos, quantidade de fretes e evolução do período.
+- Exportação em CSV e PDF para controle externo.
+- Login por magic link via Supabase Auth.
+- Plano gratuito para validação e plano Pro com histórico completo e exportações.
 
-## 📦 Como rodar o projeto
+## Stack
 
-1. **Clone o repositório:**
-   ```bash
-   git clone https://github.com/seu-usuario/truck.git
-   cd truck
-   ```
+- Next.js 16 com App Router
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- Supabase para autenticação e persistência de dados
+- jsPDF para exportação em PDF
 
-2. **Instale as dependências:**
-   ```bash
-   npm install
-   ```
+## Pré-requisitos
 
-3. **Configure as variáveis de ambiente:**
-   Crie um arquivo `.env.local` na raiz do projeto com as seguintes chaves:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=seu_url_do_supabase
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima
-   SUPABASE_SERVICE_ROLE_KEY=sua_chave_service_role
-   ADMIN_SECRET=sua_senha_de_admin
-   NEXT_PUBLIC_SITE_URL=http://localhost:3000
-   ```
+- Node.js 20 ou superior
+- npm 10 ou superior
+- Projeto Supabase com autenticação por e-mail habilitada
 
-4. **Inicie o servidor de desenvolvimento:**
-   ```bash
-   npm run dev
-   ```
+## Como rodar localmente
 
-## 🌐 Deploy
-O projeto está configurado para deploy contínuo na **Vercel**. Ao conectar seu repositório GitHub, a Vercel identificará automaticamente as configurações e fará o deploy. Não esqueça de configurar as variáveis de ambiente no painel da Vercel.
+1. Clone o repositório:
 
----
-Desenvolvido para facilitar a vida de quem vive na estrada. 🛣️💨
+```bash
+git clone https://github.com/rafamolina1/KM-De-Lucro.git
+cd KM-De-Lucro
+```
+
+2. Instale as dependências:
+
+```bash
+npm install
+```
+
+3. Crie o arquivo `.env.local` na raiz do projeto:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://SEU-PROJETO.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=SUA_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY=SUA_SERVICE_ROLE_KEY
+ADMIN_SECRET=UMA_SENHA_PARA_A_ROTA_ADMIN
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+4. Configure o Supabase Auth:
+
+- Em `Authentication > URL Configuration`, defina `Site URL` como `http://localhost:3000`.
+- Em `Additional Redirect URLs`, adicione `http://localhost:3000/auth/callback`.
+- Se você testar pelo IP da rede local, adicione também `http://SEU-IP:3000/auth/callback`.
+- Em `Authentication > Providers > Email`, deixe o login por e-mail habilitado.
+
+5. Inicie o servidor de desenvolvimento:
+
+```bash
+npm run dev
+```
+
+6. Acesse `http://localhost:3000`.
+
+## Variáveis de ambiente
+
+| Variável | Obrigatória | Uso |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Sim | URL pública do projeto Supabase. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Sim | Chave pública usada pelo cliente web para autenticação e consultas autorizadas. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Sim, para a rota admin | Chave de servidor usada pela rota `/api/admin/planos`. Não deve ser exposta no cliente. |
+| `ADMIN_SECRET` | Sim, para a rota admin | Segredo simples usado pela área administrativa interna de planos. |
+| `NEXT_PUBLIC_SITE_URL` | Recomendado | Base da aplicação para metadados e configuração de ambiente. |
+
+## Estrutura esperada no Supabase
+
+Este repositório pressupõe que o projeto Supabase já tenha, no mínimo, estas tabelas:
+
+- `profiles`, com `id` e `plan`
+- `freights`, com `id`, `user_id`, `date`, `origin`, `destination`, `km`, `value`, `diesel`, `tolls`, `other_costs`, `profit` e `margin`
+
+## Scripts disponíveis
+
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
+```
+
+## Área administrativa
+
+A rota `/admin/planos` foi feita para uso interno e depende de `ADMIN_SECRET` e `SUPABASE_SERVICE_ROLE_KEY`. Se o projeto for publicado, vale proteger esse fluxo com uma camada real de autenticação e autorização.
+
+## Deploy
+
+O projeto pode ser publicado na Vercel com a configuração padrão do Next.js.
+
+Antes do deploy:
+
+- replique as variáveis de ambiente no painel da Vercel
+- ajuste `NEXT_PUBLIC_SITE_URL` para o domínio de produção
+- adicione a URL de produção com `/auth/callback` no Supabase Auth
+
+## Observação
+
+O repositório contém a aplicação, mas não inclui migrações do banco. Se você for configurar um projeto Supabase do zero, precisará criar o esquema correspondente às tabelas usadas pelo front-end e pela rota administrativa.

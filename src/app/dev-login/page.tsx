@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { BrandMark } from "@/components/BrandMark";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function DevLoginPage() {
@@ -27,17 +28,19 @@ export default function DevLoginPage() {
           email,
           password,
         });
+
         if (error) {
           console.error(error);
-          setMessage("Erro ao criar conta. Verifique o e-mail e tente novamente.");
+          setMessage("Erro ao criar conta. Verifique os dados e tente de novo.");
         } else {
-          setMessage("Conta criada. Agora você pode entrar com e-mail e senha.");
+          setMessage("Conta criada. Agora você pode entrar normalmente.");
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
+
         if (error) {
           console.error(error);
           setMessage("E-mail ou senha inválidos.");
@@ -51,77 +54,101 @@ export default function DevLoginPage() {
   };
 
   return (
-    <div className="mx-auto max-w-md space-y-6 rounded-xl bg-white p-6 shadow-sm">
-      <h1 className="text-xl font-semibold text-[color:var(--km-blue)]">
-        Dev login (interno)
-      </h1>
-      <p className="text-xs text-red-600">
-        Esta tela é só para você testar durante o desenvolvimento. Quando for
-        lançar para motoristas, remova a rota `/dev-login`.
-      </p>
-
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <div className="space-y-1">
-          <label
-            htmlFor="email"
-            className="text-xs font-medium text-zinc-700"
-          >
-            E-mail
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none ring-0 focus:border-zinc-900"
-            placeholder="voce@exemplo.com"
-          />
+    <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+      <section className="km-panel-strong rounded-[30px] p-6 md:p-8">
+        <BrandMark />
+        <div className="mt-8 space-y-4">
+          <span className="inline-flex rounded-full border border-red-200 bg-red-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-red-700">
+            Uso interno
+          </span>
+          <h1 className="text-4xl font-bold tracking-[-0.04em] text-[color:var(--km-blue-strong)]">
+            Área de login para desenvolvimento.
+          </h1>
+          <p className="max-w-2xl text-base leading-7 text-[color:var(--foreground-muted)]">
+            Esta rota facilita seus testes com e-mail e senha no ambiente de
+            desenvolvimento. Antes de publicar, o ideal é remover a tela
+            `/dev-login`.
+          </p>
         </div>
-        <div className="space-y-1">
-          <label
-            htmlFor="password"
-            className="text-xs font-medium text-zinc-700"
-          >
-            Senha
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            minLength={6}
-            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none ring-0 focus:border-zinc-900"
-            placeholder="Mínimo 6 caracteres"
-          />
+      </section>
+
+      <section className="km-panel rounded-[30px] p-6 md:p-8">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--km-green)]">
+            Fluxo técnico
+          </p>
+          <h2 className="mt-3 text-3xl font-bold tracking-[-0.04em] text-[color:var(--km-blue-strong)]">
+            Entre ou crie uma conta de teste.
+          </h2>
         </div>
 
-        <label className="flex items-center gap-2 text-xs text-zinc-600">
-          <input
-            type="checkbox"
-            checked={isNewAccount}
-            onChange={(e) => setIsNewAccount(e.target.checked)}
-            className="h-3 w-3 rounded border-zinc-300"
-          />
-          Criar nova conta com essa senha
-        </label>
+        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+          <div className="space-y-2">
+            <label
+              htmlFor="email"
+              className="text-sm font-semibold text-[color:var(--km-blue-strong)]"
+            >
+              E-mail
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              className="km-input"
+              placeholder="voce@exemplo.com"
+            />
+          </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="flex w-full items-center justify-center rounded-md bg-[color:var(--km-green)] px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600 disabled:opacity-60"
-        >
-          {loading
-            ? isNewAccount
-              ? "Criando conta..."
-              : "Entrando..."
-            : isNewAccount
-              ? "Criar conta"
-              : "Entrar"}
-        </button>
-      </form>
+          <div className="space-y-2">
+            <label
+              htmlFor="password"
+              className="text-sm font-semibold text-[color:var(--km-blue-strong)]"
+            >
+              Senha
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              minLength={6}
+              className="km-input"
+              placeholder="Mínimo 6 caracteres"
+            />
+          </div>
 
-      {message && <p className="text-xs text-zinc-500">{message}</p>}
+          <label className="flex items-center gap-3 rounded-[20px] border border-[rgba(16,37,48,0.08)] bg-white/82 px-4 py-3 text-sm text-[color:var(--foreground-muted)]">
+            <input
+              type="checkbox"
+              checked={isNewAccount}
+              onChange={(event) => setIsNewAccount(event.target.checked)}
+              className="h-4 w-4 rounded border-[rgba(16,37,48,0.2)]"
+            />
+            Criar nova conta com esse e-mail e senha
+          </label>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="km-button-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading
+              ? isNewAccount
+                ? "Criando conta..."
+                : "Entrando..."
+              : isNewAccount
+                ? "Criar conta"
+                : "Entrar"}
+          </button>
+        </form>
+
+        {message && (
+          <div className="mt-4 rounded-[22px] border border-[rgba(16,37,48,0.08)] bg-white/84 px-4 py-3 text-sm text-[color:var(--foreground-muted)]">
+            {message}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
-

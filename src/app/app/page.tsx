@@ -21,15 +21,18 @@ export default function AppPage() {
 
   if (checking) {
     return (
-      <p className="text-sm text-zinc-600">Carregando suas informações...</p>
+      <div className="mx-auto flex min-h-[40vh] max-w-2xl items-center justify-center">
+        <div className="km-panel-strong w-full rounded-[30px] px-6 py-10 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--km-green)]">
+            Dashboard
+          </p>
+          <p className="mt-3 text-lg font-semibold text-[color:var(--km-blue-strong)]">
+            Carregando suas informações...
+          </p>
+        </div>
+      </div>
     );
   }
 
-  return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-zinc-900">Seus fretes</h1>
-      <FreightsDashboard />
-    </div>
-  );
+  return <FreightsDashboard />;
 }
-
